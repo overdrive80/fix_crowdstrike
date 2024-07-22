@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 > nul
-
-Title Reset_CrowdStrike_v1 (GATI)
+setlocal
+Title Reset_CrowdStrike_v1.1 (GATI)
 
 :rightsadmin
 	SET "pulse_tecla=Pulse una tecla para continuar."
@@ -29,6 +29,13 @@ Title Reset_CrowdStrike_v1 (GATI)
 	)
 	@echo ON
 
+:checkdir
+if not exist "%dirCrowd%" (
+	echo No existe la ruta %dirCrowd%. %pulse_tecla%
+	pause>nul
+	goto bye
+)
+
 :checkSecureMode
 reg query "HKLM\SYSTEM\CurrentControlSet\Control\Safeboot\Option" >nul 2>&1
 
@@ -42,17 +49,9 @@ if %errorlevel% neq 0 (
 :main
 	set "dirCrowd=C:\Windows\System32\drivers\CrowdStrike"
 
-	:checkdir
-	if not exist "%dirCrowd%" (
-		echo No existe la ruta %dirCrowd%
-		goto bye
-	)
-
 	:checkfiles
 	set "files=C-00000291*.sys"
-	chdir c: >nul
-	cd "%dirCrowd%"
-	
+
 	if not exist "%files%" (
 		echo No se encontraron archivos con patrón "%files%". %pulse_tecla%
 		pause>nul
@@ -60,7 +59,7 @@ if %errorlevel% neq 0 (
 	)
 		
 	:delefiles
-	del /F /Q "%files%" >nul
+	del /F /Q "%dirCrowd%\%files%" >nul
 	
 	echo Los archivos se eliminaron correctamente. %pulse_tecla%
 	pause>nul
